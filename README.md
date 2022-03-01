@@ -1,0 +1,3 @@
+# dockerApp
+
+docker-compose up
