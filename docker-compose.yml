@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+   db:
+    container_name: pg_container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    ports:
+      - "5432:5432"
+   pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"    
+   taigidb:
+    depends_on:
+      - db
+    build: ./ChhoeTaigiPgCreate
+    command: npm run dev
+   taigiapi:
+    depends_on:
+      - taigidb
+    build: ./ChhoeTaigiPgApiServer
+    ports:
+      - "3247:3247"
+    # use python rather than gunicorn for local dev
+    command: npm run dev
