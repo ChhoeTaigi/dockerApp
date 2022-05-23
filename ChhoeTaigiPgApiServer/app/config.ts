@@ -3,12 +3,12 @@
 const config = {
     IS_ENV_PRODUCTION: process.env.NODE_ENV == 'production',
 
-    HOST: '152.70.82.152',
-    HOST_LOCAL: '152.70.82.152',
+    HOST: '192.168.1.10',
+    HOST_LOCAL: '192.168.1.10',
 
     PG_DEFAULT_DATABASE: 'postgres',
-    PG_USER: 'root',
-    PG_PSWD: 'root'
+    PG_USER: 'postgres',
+    PG_PSWD: 'qazxcvbnm'
 };
 
 export default config;

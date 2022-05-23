@@ -2,8 +2,8 @@
 
 import express from 'express';
 import apiV1 from './apiV1';
-
-
+const multer = require('multer');
+const upload = multer();
 
 const { json, urlencoded } = express;
 const app = express();
@@ -15,20 +15,12 @@ app.use(urlencoded({
   })
 );
 
-// api
-app.post('/', (request, response) => {
-    response.json({ info: 'https://chhoe.taigi.info/liaukai' });
-});
-app.get('/api/', (request, response) => {
-    response.json({ info: 'ChhoeTaigi API. Beh iōng ài seng kap gún liân-lo̍k: https://chhoe.taigi.info/liaukai' });
-});
-
 // apiV1
-app.get('/api/1/dictnames', apiV1.getDictNames);
-app.get('/api/1/dictnames/:index', apiV1.getDictNameByIndex);
-app.get('/api/1/dict/:dictName', apiV1.getDictByName);
-app.get('/api/1/dict/:dictName/columns', apiV1.getDictColumnsByName);
-
+app.post('/api/getTaiwan',upload.none(), apiV1.getTaiwan);
+app.post('/api/getTaigi',upload.none(), apiV1.getKanTanChhoe);
+app.post('/api/getLongChongChhoe',upload.none(), apiV1.getLongChongChhoe);
+app.post('/api/getSiongSe',upload.none(), apiV1.getSiongSe);
+app.post('/api/getChhoeKooe',upload.none(), apiV1.getChhoeKooe);
 // listen
 app.listen(port, () => {
     console.log(`App running on port ${port}.`);
