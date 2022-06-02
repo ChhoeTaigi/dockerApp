@@ -73,9 +73,8 @@ const getChhoeKooe = async (request: Request, response: Response, next: NextFunc
   const type = request.body["type"];
   const dictcode = request.body["dictcode"];
   var taigi: alltaigi = JSON.parse(data);
-
   if (!config.IS_ENV_PRODUCTION) {
-    console.log('apiV1.getTaigi()');
+    console.log('apiV1.getChhoeKooe()');
   }
 
   if ("siongkuan" == type) {
@@ -423,7 +422,7 @@ const getSiongSe = async (request: Request, response: Response, next: NextFuncti
 
 
   if (!config.IS_ENV_PRODUCTION) {
-    console.log('apiV1.getTaigi()');
+    console.log('apiV1.getSiongSe()');
   }
     let sql = `SELECT *
     FROM taigi
@@ -451,7 +450,7 @@ const getLongChongChhoe = async (request: Request, response: Response, next: Nex
   const type = request.body["type"];
 
   if (!config.IS_ENV_PRODUCTION) {
-    console.log('apiV1.getTaigi()');
+    console.log('apiV1.getLongChongChhoe()');
   }
 
   if ("siongkuan" == type) {
@@ -495,39 +494,37 @@ const getLongChongChhoe = async (request: Request, response: Response, next: Nex
 };
 
 
-
-
-
 const getKanTanChhoe = async (request: Request, response: Response, next: NextFunction) => {
   const data = request.body["data"];
   const type = request.body["type"];
+  console.log("f======" , data)
   var taigi: taigi = JSON.parse(data);
 
   if (!config.IS_ENV_PRODUCTION) {
-    console.log('apiV1.getTaigi()');
+    console.log('apiV1.getKanTanChhoe()');
   }
 
   if ("siongkuan" == type) {
     let sql = 'SELECT * from taigi WHERE '
-    if (taigi.kipinput != "") {
+    if (taigi.kipinput != "" && taigi.kipinput != undefined) {
       sql = sql + ` "kipinput" LIKE \'%${taigi.kipinput}%\' AND`
     }
-    if (taigi.kipunicode != "") {
+    if (taigi.kipunicode != "" && taigi.kipunicode != undefined) {
       sql = sql + ` "kipunicode" LIKE \'%${taigi.kipunicode}%\' AND`
     }
-    if (taigi.pojinput != "") {
+    if (taigi.pojinput != "" && taigi.pojinput != undefined) {
       sql = sql +  ` "pojinput" LIKE \'%${taigi.pojinput}%\' AND`
     }
-    if (taigi.pojunicode != "") {
+    if (taigi.pojunicode != "" && taigi.pojunicode != undefined) {
       sql = sql +  ` "pojunicode" LIKE \'%${taigi.pojunicode}%\' AND`
     }
-    if (taigi.hanlotaibunpoj != "") {
+    if (taigi.hanlotaibunpoj != "" && taigi.hanlotaibunpoj != undefined) {
       sql = sql +  ` "hanlotaibunpoj" LIKE \'%${taigi.hanlotaibunpoj}%\' AND`
     }
-    if (taigi.hoabun != "") {
+    if (taigi.hoabun != "" && taigi.hoabun != undefined) {
       sql = sql +  ` "hoabun" LIKE \'%${taigi.hoabun}%\' AND`
     }
-    if (taigi.engbun != "") {
+    if (taigi.engbun != "" && taigi.engbun != undefined) {
       sql = sql +  ` "engbun" LIKE \'%${taigi.engbun}%\' AND`
     }
     if ( "AND" == sql.substring(sql.length-3, sql.length)) {
@@ -550,25 +547,25 @@ const getKanTanChhoe = async (request: Request, response: Response, next: NextFu
  
   } else {
     let sql = 'SELECT * from taigi WHERE '
-    if (taigi.kipinput != "") {
+    if (taigi.kipinput != "" && taigi.kipinput != undefined ) {
       sql = sql +  "kipinput =" + `\'${taigi.kipinput}\' AND`
     }
-    if (taigi.kipunicode != "") {
+    if (taigi.kipunicode != "" && taigi.kipunicode != undefined) {
       sql = sql + ` "kipunicode" =\'${taigi.kipunicode}\' AND`
     }
-    if (taigi.pojinput != "") {
+    if (taigi.pojinput != "" && taigi.pojinput != undefined) {
       sql = sql +  ` "pojinput" =\'${taigi.pojinput}\' AND`
     }
-    if (taigi.pojunicode != "") {
+    if (taigi.pojunicode != "" && taigi.pojunicode != undefined) {
       sql = sql +  ` "pojunicode" =\'${taigi.pojunicode}\' AND`
     }
-    if (taigi.hanlotaibunpoj != "") {
+    if (taigi.hanlotaibunpoj != "" && taigi.hanlotaibunpoj != undefined) {
       sql = sql +  ` "hanlotaibunpoj" =\'${taigi.hanlotaibunpoj}\' AND`
     }
-    if (taigi.hoabun != "") {
+    if (taigi.hoabun != "" && taigi.hoabun != undefined) {
       sql = sql +  ` "hoabun" =\'${taigi.hoabun}\' AND`
     }
-    if (taigi.engbun != "") {
+    if (taigi.engbun != "" && taigi.engbun != undefined) {
       sql = sql +  ` "engbun" =\'${taigi.engbun}\' AND`
     }
     if ( "AND" == sql.substring(sql.length-3, sql.length)) {
@@ -593,7 +590,7 @@ const getKanTanChhoe = async (request: Request, response: Response, next: NextFu
 
 const getTaiwan = async (request: Request, response: Response, next: NextFunction) => {
   if (!config.IS_ENV_PRODUCTION) {
-    console.log('apiV1.getTaigi()');
+    console.log('apiV1.getTaiwan()');
   }
   response.status(200).json('台灣獨立');
 
