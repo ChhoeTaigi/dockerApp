@@ -1,0 +1,10 @@
+# version: '3.8'
+# services:
+#   taigidb:
+#     volumes:
+#       - "./ChhoeTaigiPgCreate:/usr/src/app"
+#     command: tail -f
+#   taigiapi:
+#     volumes:
+#       - "./ChhoeTaigiPgApiServer:/usr/src/app"
+#     command: tail -f

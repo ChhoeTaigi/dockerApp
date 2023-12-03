@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-   db:
+  db:
     container_name: pg_container
     image: postgres
     restart: always
@@ -11,7 +11,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     ports:
       - "5432:5432"
-   pgadmin:
+  pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
     restart: always
@@ -20,12 +20,12 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"    
-   taigidb:
+  taigidb:
     depends_on:
       - db
     build: ./ChhoeTaigiPgCreate
     command: npm run dev
-   taigiapi:
+  taigiapi:
     depends_on:
       - taigidb
     build: ./ChhoeTaigiPgApiServer
