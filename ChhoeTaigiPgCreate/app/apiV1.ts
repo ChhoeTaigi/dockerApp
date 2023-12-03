@@ -1,82 +1,79 @@
 'use strict';
-import knex, { Knex } from 'knex';
-import config from './config';
+import fs from 'fs';
+import through2 from 'through2';
+import csvtojson from 'csvtojson';
 import dbQuery from "./db";
-import csv from 'csvtojson'
+
 const csvFilePath = './app/ChhoeTaigiJoined.csv'
 
-function insertheader(data: any[]) {
-  let table = ''
-  for (let index = 0; index < data.length; index++) {
-    table = table + data[index] + ' text';
-    if (index != data.length - 1) {
-      table = table + ' ,'
-    }
+let isDBCreated: Promise<any>;
+
+async function createTaigiDBFromHeader(data: any[]) {
+  await dbQuery.schema.dropTableIfExists('taigi');
+  await dbQuery.schema.createTable('taigi', function (table) {
+    table.increments();
+    data.map(columnName => {
+      table.text(columnName.toString());
+    })
+  });
+  await dbQuery('taigi').count('id');
+  console.log(`"taigi" table is ready.`);
+}
+
+async function batchInsertList(rowList: Array<Object>) {
+  try {
+    await isDBCreated;
+    // console.log(rowList)
+    const idList = await dbQuery.insert( rowList, ['id']).into('taigi');
+    console.log(`Batch ${idList.length}.`);
+    // console.log(idList.map(({ id }) => id));
+  } catch (e) {
+    console.error(e);
   }
-  console.log("data:" ,table )
-  let createtablestr = 'CREATE TABLE taigi ('+ table + ');'
-  console.log('createtablestr:',createtablestr)
-  dbQuery.raw(createtablestr)
-    .then(function (result: { rows: any; }) {
-      if (!config.IS_ENV_PRODUCTION) {
-        console.log('apiV1.createDB(): result');
-      }
-      console.log('apiV1.createDB(): result');
-    })
-    .catch(function (error: any) {
-      if (!config.IS_ENV_PRODUCTION) {
-        console.log(`apiV1.createDB(): errors: ${error}.`);
-      }
-
-      // response.status(500);
-    });
 }
 
-async function insertdata(data: string ) {
-  console.log("data:" ,data) // => [["1","2","3"], ["4","5","6"], ["7","8","9"]]
-  await dbQuery.raw(data)
-    .then(function (result: { rows: any; }) {
-      console.log(`success`);
-    })
-    .catch(function (error: any) {
-      if (!config.IS_ENV_PRODUCTION) {
-        console.log(`apiV1.createDB(): errors: ${error}.`);
-      }
-
-      // response.status(500);
-    });
-}
-var rows: any[] = []
+let once = false;
 
 function createDB() {
+  const csv = csvtojson();
+  csv.on('header', (headers: any) => { 
+    isDBCreated = createTaigiDBFromHeader(headers) 
+  });
 
-  csv({
-    noheader: false,
-    output: "csv"
-  })
-    .fromFile(csvFilePath)
-    .on('header', (headers: any) => { insertheader(headers) })
-    .on('data', (data) => {
-      let jsonStr = data.toString('utf8')
-      jsonStr = jsonStr.replace(/\"/g, '\'');
-      jsonStr = jsonStr.replace('[', '');
-      jsonStr = jsonStr.replace(']', '');
-      let datainsert = 'INSERT INTO taigi VALUES (' + jsonStr + ');'
-      rows.push(datainsert)
-      console.log("num:" , rows.length)
-    
+  fs.createReadStream(csvFilePath)
+  .pipe(csv)
+  .pipe(through2({ objectMode: true }, function transform(this: any, chunk: Buffer, enc: string, callback: any) {
+    this.rowList = this.rowList || [];
+    if (this.rowList.length < 1000) {
+      try {
+        this.rowList.push(JSON.parse(chunk.toString()))
+      } catch (e) {
+        console.error(e)
+      }
+    } else {
+      this.push(this.rowList);
+      this.rowList = [];
     }
-    ).on('done',(done)=>{
-      const chunkSize = 30;
-      console.log("done:" , rows.length)
-      console.log("done:" , rows)
-     for (let index = 0; index < rows.length; index++) {
-       insertdata(rows[index])
-       
-     }
-  })
-};
+    callback()
+  }, function flush(this: any, callback: any) {
+    this.push(this.rowList);
+    callback();
+  }))
+  .pipe(through2({ objectMode: true }, function (this: any, rowList: Array<Object>, enc: string, callback: any) {
+    // if (once) {
+    //   return;
+    // }
+    // once = true;
+    batchInsertList(rowList).then(callback)
+  }))
+  .on('finish', async () => {
+    const [{ count }] = await dbQuery('taigi').count({ count: '*' });
+    const lastRow = await dbQuery('taigi').where('JoinedWordID', '353511').select();
 
+    console.log(`All ${count} rows are inserted.`);
+    console.log(`Last row is: `, lastRow);
+  });
+};
 
 export default {
   createDB,
